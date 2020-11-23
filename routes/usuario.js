@@ -19,8 +19,12 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 /* Obtener todos los usuarios */
 app.get('/', (req, res, next) => {
 
+    var desde = Number(req.query.desde || 0);
+
     /* aqui se lee "busca todos los datos, solo los campos nombre email img role"  y luego el .exec es para ejecutar el query*/
     Usuario.find({ }, 'nombre email img role')
+            .skip(desde)
+            .limit(5)
            .exec(
                (err, usuarios) => { 
 
@@ -32,11 +36,17 @@ app.get('/', (req, res, next) => {
                     });
                 }
 
-                res.status(200).json({
-                    ok: true,
-                    mensaje: 'Usuarios',
-                    usuarios: usuarios
-                });
+                Usuario.count({}, (err, conteo) =>{
+
+                    res.status(200).json({
+                        ok: true,
+                        mensaje: 'Usuarios',
+                        usuarios: usuarios,
+                        total: conteo
+                    });
+
+
+                })
 
             }) 
 
